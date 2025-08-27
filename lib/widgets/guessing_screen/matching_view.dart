@@ -166,6 +166,8 @@ class _MatchingViewState extends State<MatchingView> {
   }
 
   Widget _buildItem(int id, bool isQuestion) {
+    final theme = Theme.of(context);
+    final bool isDarkMode = theme.brightness == Brightness.dark;
     final text = isQuestion ? idToQuestion[id]! : idToAnswer[id]!;
     final bool isSelected = isQuestion
         ? selectedQuestionId == id
@@ -176,6 +178,7 @@ class _MatchingViewState extends State<MatchingView> {
 
     // --- Style selection logic ---
     final baseTextStyle = TextStyle(
+      color: isDarkMode ? Colors.white : theme.colorScheme.onPrimary,
       fontWeight: FontWeight.bold,
       fontSize: text.length > 25 ? 12.0 : 14.0,
     );
