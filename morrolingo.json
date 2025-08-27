@@ -1,0 +1,11 @@
+{
+  "name": "Morrolingo",
+  "bundleIdentifier": "com.example.morrolingo",
+  "version": "1.0.0",
+  "buildNumber": "1",
+  "author": "Twoje Imię",
+  "description": "Aplikacja edukacyjna",
+  "platform": "ios",
+  "icon": "https://raw.githubusercontent.com/Michiczi/morrolingo/main/assets/images/morrolingo-icon.png",
+  "url": "https://github.com/Michiczi/morrolingo/releases/download/v1.0/FlutterIpaExport.ipa"
+}
