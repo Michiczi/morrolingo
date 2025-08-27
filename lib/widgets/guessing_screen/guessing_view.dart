@@ -31,6 +31,7 @@ class GuessingView extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           TextField(
+            textAlign: TextAlign.center,
             controller: answerController,
             focusNode: answerFocusNode, // Assign the FocusNode
             decoration: const InputDecoration(

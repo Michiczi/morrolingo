@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:morrolingo/database/app_database.dart';
 import 'package:morrolingo/database/question.dart';
 import 'package:morrolingo/utilities/class/questions_stream_class.dart';
@@ -230,7 +232,10 @@ class _QuestionDataScreenState extends State<QuestionDataScreen> {
       );
       return;
     }
+    _showManualAddQuestionDialog();
+  }
 
+  void _showManualAddQuestionDialog() async {
     final result = await showDialog<dynamic>(
       context: context,
       builder: (context) => AddQuestionDialog(
@@ -287,6 +292,76 @@ class _QuestionDataScreenState extends State<QuestionDataScreen> {
         await _database.questionDao.insertMultipleQuestions(newQuestions);
         _loadQuestions();
       }
+    }
+  }
+
+  Future<void> _addQuestionFromCamera() async {
+    final status = await Permission.camera.request();
+
+    if (status.isGranted) {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+
+      if (image != null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Zdjęcie zrobione: ${image.path}')),
+        );
+        // TODO: Implement logic to process the image and extract questions
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Anulowano robienie zdjęcia.')),
+        );
+      }
+    } else if (status.isDenied) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Brak uprawnień do aparatu.')),
+      );
+    } else if (status.isPermanentlyDenied) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Uprawnienia do aparatu zostały trwale odrzucone. Proszę włączyć je w ustawieniach aplikacji.')),
+      );
+      openAppSettings(); // Open app settings
+    }
+  }
+
+  Future<void> _addQuestionFromGallery() async {
+    final status = await Permission.photos.request(); // Use Permission.photos for gallery access
+
+    if (status.isGranted) {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+      if (image != null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Wybrano zdjęcie z galerii: ${image.path}')),
+        );
+        // TODO: Implement logic to process the image and extract questions
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Anulowano wybór zdjęcia z galerii.')),
+        );
+      }
+    } else if (status.isDenied) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Brak uprawnień do galerii.')),
+      );
+    } else if (status.isPermanentlyDenied) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Uprawnienia do galerii zostały trwale odrzucone. Proszę włączyć je w ustawieniach aplikacji.')),
+      );
+      openAppSettings(); // Open app settings
     }
   }
 

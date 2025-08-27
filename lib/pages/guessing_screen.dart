@@ -39,6 +39,9 @@ class _GuessingScreenState extends State<GuessingScreen> {
   int _highestStreak = 0;
   late DateTime _sessionStartTime;
 
+  Key _matchingViewKey = UniqueKey();
+  int _lastStreakPopupValue = 0;
+
   Question? _currentQuestion;
 
   bool _isLoading = true;
@@ -275,15 +278,22 @@ class _GuessingScreenState extends State<GuessingScreen> {
     });
 
     // 🔹 przejście dalej tylko jeśli odpowiedź była poprawna
-    if (shouldProceed == true && isCorrect) {
+    if (shouldProceed == true) {
       setState(() {
         Question processedQuestion = _questions.removeAt(0);
 
-        _currentStreak++;
-        if (_currentStreak > _highestStreak) {
-          _highestStreak = _currentStreak;
+        if (isCorrect) {
+          _currentStreak++;
+          if (_currentStreak > _highestStreak) {
+            _highestStreak = _currentStreak;
+          }
+          _answeredQuestions.add(processedQuestion);
+        } else {
+          _currentStreak = 0;
+          if (!_wrongAnswers.any((q) => q.id == processedQuestion.id)) {
+            _wrongAnswers.add(processedQuestion);
+          }
         }
-        _answeredQuestions.add(processedQuestion);
 
         // 🟢 tutaj dopiero resetujemy zaznaczenie, bo pytanie się zmienia
         _selectedMcOption = null;
@@ -292,16 +302,6 @@ class _GuessingScreenState extends State<GuessingScreen> {
 
       await WidgetsBinding.instance.endOfFrame;
       _proceedToNextStep();
-    }
-    // 🔹 jeśli było źle → pytanie zostaje i czerwone zaznaczenie też
-    else if (!isCorrect) {
-      setState(() {
-        _currentStreak = 0;
-        if (!_wrongAnswers.any((q) => q.id == _currentQuestion!.id)) {
-          _wrongAnswers.add(_currentQuestion!);
-        }
-        // pytanie zostaje w puli → gracz musi spróbować ponownie
-      });
     }
   }
 
@@ -333,6 +333,7 @@ class _GuessingScreenState extends State<GuessingScreen> {
           }
           _answeredQuestions.addAll(_matchingQuestions);
           _questions.removeWhere((q) => matchingIds.contains(q.id));
+          _matchingViewKey = UniqueKey(); // <--- ADDED THIS LINE
         } else {
           _currentStreak = 0;
           for (final q in _matchingQuestions) {
@@ -369,6 +370,11 @@ class _GuessingScreenState extends State<GuessingScreen> {
       if (shouldProceed == true) {
         // If user clicks "Next" on the incorrect result bottom sheet,
         // we should proceed to the next question/mode.
+        if (_currentMode == LearningMode.matching) {
+          setState(() {
+            _matchingViewKey = UniqueKey(); // Force rebuild of MatchingView
+          });
+        }
         _selectNextMode();
       }
     }
@@ -376,26 +382,20 @@ class _GuessingScreenState extends State<GuessingScreen> {
     // The _handleMatchingFinished will be called when all pairs are matched.
   }
 
-  bool _checkStreak() {
-    if (_currentStreak == 0) return false;
-    int temp = _currentStreak;
-    for (int i = 0; i < 4; i++) {
-      if (temp > 0 && temp % 5 == 0) {
-        return true;
-      }
-      temp--;
-    }
-    return false;
-  }
-
   Future<void> _proceedToNextStep() async {
-    if (_checkStreak()) {
+    // Calculate the next multiple of 5 that should trigger a popup
+    int nextMultipleOf5 = ((_lastStreakPopupValue ~/ 5) + 1) * 5;
+
+    // Check if the current streak has reached or crossed the next multiple of 5
+    if (_currentStreak >= nextMultipleOf5) {
       await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => StreakScreen(streakCount: _currentStreak),
         ),
       );
+      // Update _lastStreakPopupValue to the multiple of 5 that was just passed
+      _lastStreakPopupValue = nextMultipleOf5;
     } else {
       await Future.delayed(Duration.zero);
     }
@@ -579,6 +579,7 @@ class _GuessingScreenState extends State<GuessingScreen> {
           );
         }
         return MatchingView(
+          key: _matchingViewKey,
           questions: _matchingQuestions,
           onGameFinished: _handleMatchingFinished,
           onMatchResult: _handleMatchingResult,

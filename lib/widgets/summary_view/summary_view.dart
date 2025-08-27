@@ -261,6 +261,7 @@ class _SummaryViewState extends State<SummaryView>
                     textStyle: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.surface,
                     ),
                   ),
                 ),

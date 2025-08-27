@@ -1,7 +1,7 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vibration/vibration.dart';
+import 'package:morrolingo/widgets/custom_button.dart';
 
 class StreakScreen extends StatefulWidget {
   final int streakCount;
@@ -27,26 +27,41 @@ class _StreakScreenState extends State<StreakScreen> {
         HapticFeedback.mediumImpact(); // fallback dla iOS
       }
     });
-
-    // Zamknięcie ekranu po 1s
-    Timer(const Duration(seconds: 1), () {
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.green.withAlpha(200),
-      body: Center(
-        child: Text(
-          '${widget.streakCount} pytań z rzędu!',
-          style: const TextStyle(
-            fontSize: 32,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: Colors.green.withAlpha(200),
+        body: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${widget.streakCount} pytań z rzędu!',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 32,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 40),
+              CustomButton(
+                text: 'Kontynuuj',
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: CustomButtonStyle(
+                  buttonColor: Colors.white,
+                  bottomColor: Colors.grey.shade300,
+                  textStyle: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
         ),
       ),
