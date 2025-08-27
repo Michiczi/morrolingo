@@ -19,7 +19,7 @@ jobs:
 
       - name: Set iOS deployment target to 16
         run: |
-          sed -i '' "s/platform :ios, '16.0'/platform :ios, '16.0'/g" ios/Podfile
+          sed -i '' "s/platform :ios, '15.5'/platform :ios, '16.0'/g" ios/Podfile
 
       - run: pod repo update
         working-directory: ios
