@@ -9,7 +9,7 @@
         "version": "1.0.0",
         "versionDate": "2025-08-28",
         "author": "Michiczi",
-        "description": "Aplikacja edukacyjna",
+        "localizedDescription": "Aplikacja edukacyjna",
         "platform": "ios",
         "tintColor": "007aff",
         "iconURL": "https://raw.githubusercontent.com/Michiczi/morrolingo/main/assets/images/morrolingo-icon.png",
