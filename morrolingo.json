@@ -1,20 +1,19 @@
 {
   "name": "Morrolingo",
   "identifier": "com.michal.altstore",
-  "apps":[
+  "apps": [
     {
-        "name": "Morrolingo",
-        "bundleIdentifier": "com.example.morrolingo",
-        "developerName": "Michał Kardasz",
-        "version": "1.0.0",
-        "versionDate": "2025-08-28",
-        "author": "Michiczi",
-        "localizedDescription": "Aplikacja edukacyjna",
-        "platform": "ios",
-        "tintColor": "007aff",
-        "iconURL": "https://raw.githubusercontent.com/Michiczi/morrolingo/main/assets/images/morrolingo-icon.png",
-        "downloadURL": "https://github.com/Michiczi/morrolingo/releases/download/v1.0/FlutterIpaExport.ipa",
-        "size": "21737413"
+      "name": "Morrolingo",
+      "bundleIdentifier": "com.example.morrolingo",
+      "developerName": "Michał Kardasz",
+      "version": "1.0.0",
+      "versionDate": "2025-08-28",
+      "localizedDescription": "Aplikacja edukacyjna",
+      "platform": "ios",
+      "tintColor": "007aff",
+      "iconURL": "https://raw.githubusercontent.com/Michiczi/morrolingo/main/assets/images/morrolingo-icon.png",
+      "downloadURL": "https://github.com/Michiczi/morrolingo/releases/download/v1.0/FlutterIpaExport.ipa",
+      "size": 21737413
     }
   ]
 }
