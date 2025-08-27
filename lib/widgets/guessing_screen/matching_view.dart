@@ -4,11 +4,13 @@ import 'package:morrolingo/widgets/custom_button.dart';
 
 class MatchingView extends StatefulWidget {
   final List<Question> questions;
-  final Function(bool allCorrect) onGameFinished;
+  final Function(bool isCorrect, Question question) onMatchResult;
+  final Function(bool isCorrect) onGameFinished;
 
   const MatchingView({
     super.key,
     required this.questions,
+    required this.onMatchResult,
     required this.onGameFinished,
   });
 
@@ -32,6 +34,7 @@ class _MatchingViewState extends State<MatchingView> {
   int? incorrectQuestionId;
   int? incorrectAnswerId;
   bool gameEnded = false;
+  bool hadMistake = false;
 
   @override
   void initState() {
@@ -63,6 +66,11 @@ class _MatchingViewState extends State<MatchingView> {
   void _onItemSelected(int id, bool isQuestion) {
     if (gameEnded) return;
 
+    // Prevent selection of incorrect items
+    if ((isQuestion && incorrectQuestionId == id) || (!isQuestion && incorrectAnswerId == id)) {
+      return;
+    }
+
     if (isQuestion) {
       // ignore selection of already correctly matched question
       if (correctMatches.containsKey(id)) return;
@@ -87,14 +95,15 @@ class _MatchingViewState extends State<MatchingView> {
     final qId = selectedQuestionId!;
     final aId = selectedAnswerId!;
 
-    // correct if ids are equal (since idToAnswer[id] is answer for question id)
-    if (qId == aId) {
+    if (idToAnswer[qId] == idToAnswer[aId]) {
       bool isGameFinished = false;
       setState(() {
         correctMatches[qId] = true;
-        // clear selections
         selectedQuestionId = null;
         selectedAnswerId = null;
+        incorrectQuestionId = null;
+        incorrectAnswerId = null;
+
         if (correctMatches.length == widget.questions.length) {
           gameEnded = true;
           isGameFinished = true;
@@ -102,23 +111,19 @@ class _MatchingViewState extends State<MatchingView> {
       });
 
       if (isGameFinished) {
-        // give a tiny delay so UI can show last green state before navigation
         Future.delayed(const Duration(milliseconds: 120), () {
           if (mounted) widget.onGameFinished(true);
         });
       }
     } else {
-      // incorrect: mark pair, block input and notify parent after short delay
       setState(() {
-        gameEnded = true;
         incorrectQuestionId = qId;
         incorrectAnswerId = aId;
+        selectedQuestionId = null;
+        selectedAnswerId = null;
       });
-
-      // keep incorrect highlight visible for a short moment, then finish
-      Future.delayed(const Duration(milliseconds: 600), () {
-        if (mounted) widget.onGameFinished(false);
-      });
+      // Immediately show result bottom sheet for incorrect match
+      widget.onMatchResult(false, widget.questions[qId]);
     }
   }
 
@@ -174,7 +179,8 @@ class _MatchingViewState extends State<MatchingView> {
         : selectedAnswerId == id;
     final bool isCorrectlyMatched = correctMatches.containsKey(id);
     final bool isIncorrect =
-        (incorrectQuestionId == id) || (incorrectAnswerId == id);
+        (incorrectQuestionId == id && isQuestion) ||
+        (incorrectAnswerId == id && !isQuestion);
 
     // --- Style selection logic ---
     final baseTextStyle = TextStyle(
@@ -213,4 +219,11 @@ class _MatchingViewState extends State<MatchingView> {
       ),
     );
   }
+}
+
+class MatchingItem {
+  final int id; // id pytania
+  final bool isQuestion;
+
+  MatchingItem(this.id, this.isQuestion);
 }

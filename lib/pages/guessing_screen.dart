@@ -260,37 +260,48 @@ class _GuessingScreenState extends State<GuessingScreen> {
       });
     }
 
+    // 🔹 zaznaczamy odpowiedź i pokazujemy wynik
     setState(() {
       _selectedMcOption = selectedAnswer;
       _showResult = true;
     });
 
+    // 🔹 pokazujemy bottomsheet
     final bool? shouldProceed = await _showResultView(isCorrect);
 
+    // 🔹 resetujemy pasek dopiero po wyświetleniu
     setState(() {
       _visualProgressIncrement = 0;
     });
 
-    if (shouldProceed == true) {
+    // 🔹 przejście dalej tylko jeśli odpowiedź była poprawna
+    if (shouldProceed == true && isCorrect) {
       setState(() {
         Question processedQuestion = _questions.removeAt(0);
-        if (isCorrect) {
-          _currentStreak++;
-          if (_currentStreak > _highestStreak) {
-            _highestStreak = _currentStreak;
-          }
-          _answeredQuestions.add(processedQuestion);
-        } else {
-          _currentStreak = 0;
-          if (!_wrongAnswers.any((q) => q.id == processedQuestion.id)) {
-            _wrongAnswers.add(processedQuestion);
-          }
-          _questions.add(processedQuestion);
+
+        _currentStreak++;
+        if (_currentStreak > _highestStreak) {
+          _highestStreak = _currentStreak;
         }
+        _answeredQuestions.add(processedQuestion);
+
+        // 🟢 tutaj dopiero resetujemy zaznaczenie, bo pytanie się zmienia
+        _selectedMcOption = null;
+        _showResult = false;
       });
 
       await WidgetsBinding.instance.endOfFrame;
       _proceedToNextStep();
+    }
+    // 🔹 jeśli było źle → pytanie zostaje i czerwone zaznaczenie też
+    else if (!isCorrect) {
+      setState(() {
+        _currentStreak = 0;
+        if (!_wrongAnswers.any((q) => q.id == _currentQuestion!.id)) {
+          _wrongAnswers.add(_currentQuestion!);
+        }
+        // pytanie zostaje w puli → gracz musi spróbować ponownie
+      });
     }
   }
 
@@ -339,6 +350,32 @@ class _GuessingScreenState extends State<GuessingScreen> {
     }
   }
 
+  Future<void> _handleMatchingResult(bool isCorrect, Question question) async {
+    // This method is called when an individual match is made (correct or incorrect)
+    // For this bug, we are focusing on incorrect matches.
+    if (!isCorrect) {
+      setState(() {
+        _currentStreak = 0;
+        if (!_wrongAnswers.any((q) => q.id == question.id)) {
+          _wrongAnswers.add(question);
+        }
+      });
+
+      final bool? shouldProceed = await _showResultView(
+        isCorrect,
+        questionToShow: question,
+      );
+
+      if (shouldProceed == true) {
+        // If user clicks "Next" on the incorrect result bottom sheet,
+        // we should proceed to the next question/mode.
+        _selectNextMode();
+      }
+    }
+    // If it's a correct match, we don't show a bottom sheet immediately.
+    // The _handleMatchingFinished will be called when all pairs are matched.
+  }
+
   bool _checkStreak() {
     if (_currentStreak == 0) return false;
     int temp = _currentStreak;
@@ -368,8 +405,11 @@ class _GuessingScreenState extends State<GuessingScreen> {
   Future<bool?> _showResultView(
     bool isCorrect, {
     String? customCorrectAnswer,
+    Question? questionToShow,
   }) async {
-    if (_currentMode != LearningMode.matching && _currentQuestion == null) {
+    if (_currentMode != LearningMode.matching &&
+        _currentQuestion == null &&
+        questionToShow == null) {
       return null;
     }
     setState(() {
@@ -388,7 +428,10 @@ class _GuessingScreenState extends State<GuessingScreen> {
       builder: (context) {
         return ResultBottomSheet(
           isCorrect: isCorrect,
-          correctAnswer: customCorrectAnswer ?? _currentQuestion?.answer ?? '',
+          correctAnswer:
+              customCorrectAnswer ??
+              (questionToShow ?? _currentQuestion)?.answer ??
+              '',
         );
       },
     );
@@ -538,6 +581,7 @@ class _GuessingScreenState extends State<GuessingScreen> {
         return MatchingView(
           questions: _matchingQuestions,
           onGameFinished: _handleMatchingFinished,
+          onMatchResult: _handleMatchingResult,
         );
       default:
         return const SizedBox.shrink();
