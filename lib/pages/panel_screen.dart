@@ -45,10 +45,15 @@ class _PanelScreenState extends State<PanelScreen> {
   }
 
   Future<void> _checkAndRequestPermissions() async {
-    await [
+    Map<Permission, PermissionStatus> statuses = await [
       Permission.camera,
       Permission.photos,
     ].request();
+
+    if (statuses[Permission.camera] == PermissionStatus.permanentlyDenied ||
+        statuses[Permission.photos] == PermissionStatus.permanentlyDenied) {
+      await openAppSettings();
+    }
   }
 
   @override
