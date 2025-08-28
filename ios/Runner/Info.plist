@@ -46,11 +46,9 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Aplikacja potrzebuje dostępu do aparatu, aby robić zdjęcia.</string>
-
+	<string>Aplikacja potrzebuje dostępu do aparatu, aby umożliwić dodawanie zdjęć do pytań.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Aplikacja potrzebuje dostępu do galerii, aby wybierać zdjęcia.</string>
-
+	<string>Aplikacja potrzebuje dostępu do galerii, aby umożliwić wybieranie zdjęć do pytań.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Aplikacja potrzebuje dostępu, aby zapisywać zdjęcia w galerii.</string>
 </dict>
