@@ -293,6 +293,7 @@ class _GuessingScreenState extends State<GuessingScreen> {
           if (!_wrongAnswers.any((q) => q.id == processedQuestion.id)) {
             _wrongAnswers.add(processedQuestion);
           }
+          _questions.add(processedQuestion);
         }
 
         // 🟢 tutaj dopiero resetujemy zaznaczenie, bo pytanie się zmienia
@@ -368,13 +369,15 @@ class _GuessingScreenState extends State<GuessingScreen> {
       );
 
       if (shouldProceed == true) {
-        // If user clicks "Next" on the incorrect result bottom sheet,
-        // we should proceed to the next question/mode.
-        if (_currentMode == LearningMode.matching) {
-          setState(() {
-            _matchingViewKey = UniqueKey(); // Force rebuild of MatchingView
-          });
-        }
+        // When an incorrect match is made, move all questions from this
+        // matching game to the end of the queue and start a new mode.
+        setState(() {
+          final matchingIds = _matchingQuestions.map((q) => q.id).toSet();
+          _questions.removeWhere((q) => matchingIds.contains(q.id));
+          _questions.addAll(_matchingQuestions);
+          _matchingViewKey = UniqueKey();
+        });
+
         _selectNextMode();
       }
     }
