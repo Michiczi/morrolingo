@@ -15,7 +15,9 @@ jobs:
           channel: 'stable'
           architecture: x64
 
-      - run: flutter pub get
+      - name: Install dependencies
+        run: |
+          flutter pub get
 
       - name: Set iOS deployment target to 17 in Podfile
         run: |
@@ -25,26 +27,42 @@ jobs:
         run: |
           sed -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = 18.0;/IPHONEOS_DEPLOYMENT_TARGET = 17.0;/g" ios/Runner.xcodeproj/project.pbxproj
 
-      - run: pod repo update
+      # Krok 1: Wyczyść bufory Xcode
+      - name: Clean Xcode derived data
+        run: rm -rf ~/Library/Developer/Xcode/DerivedData
+
+      - name: Clean Flutter build cache
+        run: flutter clean
+
+      - name: Update CocoaPods
+        run: pod repo update
         working-directory: ios
 
-      - run: flutter build ios --release --no-codesign
-
-      - run: mkdir Payload
-        working-directory: build/ios/iphoneos
-
-      - run: mv Runner.app/ Payload
-        working-directory: build/ios/iphoneos
-
-      - name: Zip output
-        run: zip -qq -r -9 FlutterIpaExport.ipa Payload
-        working-directory: build/ios/iphoneos
-
+      # Krok 2: Konfiguracja podpisywania kodu
+      - name: Decode certificate and provisioning profile from secrets
+        run: |
+          echo "${{ secrets.DISTRIBUTION_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
+          echo "${{ secrets.PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > profile.mobileprovision
+          
+      - name: Import certificate to keychain
+        run: |
+          security create-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} build.keychain
+          security import certificate.p12 -k build.keychain -P ${{ secrets.CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool: -S apple: -k build.keychain -p ${{ secrets.KEYCHAIN_PASSWORD }}
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles/
+          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+      
+      # Krok 3: Kompilacja i archiwizacja (usuwamy --no-codesign)
+      - name: Build and archive iOS app
+        run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+      
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/ios/iphoneos/FlutterIpaExport.ipa
+          file: build/ios/ipa/*.ipa
           tag: v1.0
           overwrite: true
           body: "This is first release"
