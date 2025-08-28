@@ -98,15 +98,9 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
 
     if (!mounted) return;
 
-    if (status.isGranted || status.isLimited) {
-      await _proceedWithImagePicking(source);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Odmówiono uprawnień. Nie można wybrać obrazu.'),
-        ),
-      );
-    }
+
+    await _proceedWithImagePicking(source);
+    
   }
 
   Future<void> _proceedWithImagePicking(ImageSource source) async {
