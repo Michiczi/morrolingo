@@ -294,20 +294,14 @@ class _QuestionDataScreenState extends State<QuestionDataScreen> {
   }
 
   void _showEditQuestionDialog(Question questionToEdit) async {
-    final result = await showDialog<Map<String, String>>(
+    final result = await showDialog<Question>(
       context: context,
       builder: (context) => AddQuestionDialog.single(question: questionToEdit),
     );
     if (result != null) {
-      final updatedQuestion = Question(
-        id: questionToEdit.id,
-        subject: questionToEdit.subject,
-        question: result['question']!,
-        answer: result['answer']!,
-      );
-
-      await _database.questionDao.updateQuestion(updatedQuestion);
+      await _database.questionDao.updateQuestion(result);
       _loadQuestions();
+      _clearSelection();
     }
   }
 

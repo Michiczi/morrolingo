@@ -271,8 +271,9 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
           ),
           TextButton(
             onPressed: () async {
-              final questionText = _questionController.text;
-              final answerText = _answerController.text;
+              final questionText = _questionController.text.trim();
+              final answerText = _answerController.text.trim();
+
               if (_isBulkMode) {
                 final lines = _multilineController.text.split('\n');
                 final validQuestionAnswerPairs = <Map<String, String>>[];
@@ -473,6 +474,32 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
                       Navigator.of(context).pop();
                     }
                   }
+                }
+              } else {
+                // Single item mode (add or edit)
+                if (questionText.isNotEmpty && answerText.isNotEmpty) {
+                  if (widget.question != null) {
+                    // Edit mode: return updated Question object
+                    final updatedQuestion = widget.question!.copyWith(
+                      question: questionText,
+                      answer: answerText,
+                    );
+                    Navigator.of(context).pop(updatedQuestion);
+                  } else {
+                    // Add mode: return map
+                    Navigator.of(context).pop({
+                      'question': questionText,
+                      'answer': answerText,
+                    });
+                  }
+                } else {
+                  // Optional: Show an error if fields are empty
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Pytanie i odpowiedź nie mogą być puste.'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
                 }
               }
             },
