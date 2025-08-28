@@ -37,22 +37,6 @@ jobs:
       - name: Update CocoaPods
         run: pod repo update
         working-directory: ios
-
-      # Krok 2: Konfiguracja podpisywania kodu
-      - name: Decode certificate and provisioning profile from secrets
-        run: |
-          echo "${{ secrets.DISTRIBUTION_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
-          echo "${{ secrets.PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > profile.mobileprovision
-          
-      - name: Import certificate to keychain
-        run: |
-          security create-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} build.keychain
-          security import certificate.p12 -k build.keychain -P ${{ secrets.CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool: -S apple: -k build.keychain -p ${{ secrets.KEYCHAIN_PASSWORD }}
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles/
-          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
       
       # Krok 3: Kompilacja i archiwizacja (usuwamy --no-codesign)
       - name: Build and archive iOS app
