@@ -1,0 +1,58 @@
+name: morrolingo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: 🎉 iOS Build for Sideloading
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          architecture: x64
+
+      - name: Set iOS deployment target to 17 in Podfile
+        run: |
+          sed -i '' "s/platform :ios, '15.5'/platform :ios, '17.0'/g" ios/Podfile
+
+      - name: Force iOS Deployment Target in Xcode project
+        run: |
+          sed -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = 18.0;/IPHONEOS_DEPLOYMENT_TARGET = 17.0;/g" ios/Runner.xcodeproj/project.pbxproj
+
+      - name: Clean build environment
+        run: flutter clean
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Install Pods
+        run: pod install
+        working-directory: ios
+
+      - name: Build unsigned.app file
+        run: flutter build ios --release --no-codesign
+
+      - name: Prepare Payload directory
+        run: |
+          mkdir -p Payload
+        working-directory: build/ios/iphoneos
+
+      - name: Move app bundle to Payload
+        run: |
+          mv Runner.app Payload/
+        working-directory: build/ios/iphoneos
+
+      - name: Zip to.ipa
+        run: |
+          zip -r -y morrolingo.ipa Payload/
+        working-directory: build/ios/iphoneos
+
+      - name: Upload unsigned.ipa as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Unsigned-morrolingo-ipa
+          path: build/ios/iphoneos/morrolingo.ipa
