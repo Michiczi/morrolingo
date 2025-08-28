@@ -16,7 +16,7 @@ jobs:
           architecture: x64
 
       - name: Set iOS deployment target to 17 in Podfile
-        run : | 
+        run: | 
           sed -i '' "s/platform :ios, '15.5'/platform :ios, '17.0'/g" ios/Podfile
       - name: Force iOS Deployment Target in Xcode project
         run: |
