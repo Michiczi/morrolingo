@@ -1,52 +1,60 @@
 name: morrolingo
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-  build-ios:
-    name: 🎉 iOS Build
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
+  build-ios:
+    name: 🎉 iOS Build for Sideloading
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
 
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          architecture: x64
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          architecture: x64
 
-      - name: Install dependencies
-        run: |
-          flutter pub get
+      - name: Set iOS deployment target to 17 in Podfile
+        run: |
+          sed -i '' "s/platform :ios, '15.5'/platform :ios, '17.0'/g" ios/Podfile
 
-      - name: Set iOS deployment target to 17 in Podfile
-        run: |
-          sed -i '' "s/platform :ios, '15.5'/platform :ios, '17.0'/g" ios/Podfile
+      - name: Force iOS Deployment Target in Xcode project
+        run: |
+          sed -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = 18.0;/IPHONEOS_DEPLOYMENT_TARGET = 17.0;/g" ios/Runner.xcodeproj/project.pbxproj
 
-      - name: Force iOS Deployment Target in Xcode project
-        run: |
-          sed -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = 18.0;/IPHONEOS_DEPLOYMENT_TARGET = 17.0;/g" ios/Runner.xcodeproj/project.pbxproj
+      - name: Clean build environment
+        run: |
+          flutter clean
+          pod cache clean --all
+          rm -rf ~/Library/Developer/Xcode/DerivedData
 
-      # Krok 1: Wyczyść bufory Xcode
-      - name: Clean Xcode derived data
-        run: rm -rf ~/Library/Developer/Xcode/DerivedData
+      - name: Install dependencies
+        run: flutter pub get
 
-      - name: Clean Flutter build cache
-        run: flutter clean
+      - name: Install Pods
+        run: pod install
+        working-directory: ios
 
-      - name: Update CocoaPods
-        run: pod repo update
-        working-directory: ios
-      
-      # Krok 3: Kompilacja i archiwizacja (usuwamy --no-codesign)
-      - name: Build and archive iOS app
-        run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
-      
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/ios/ipa/*.ipa
-          tag: v1.0
-          overwrite: true
-          body: "This is first release"
+      # Krok: Budowanie archiwum Xcode bez podpisu (xcarchive)
+      - name: Build Xcode archive without code signing
+        run: |
+          flutter build ipa --no-codesign
+        
+      # Krok: Zmiana nazwy archiwum, aby było łatwiejsze do zlokalizowania
+      - name: Rename xcarchive file
+        run: |
+          # Znajduje archiwum i kopiuje je do katalogu głównego
+          cp $(find build/ios/archive -name "*.xcarchive") build/ios/Runner.xcarchive
+
+      # Krok: Archiwizacja pliku.xcarchive
+      - name: Zip xcarchive for upload
+        run: |
+          zip -r Runner.xcarchive.zip build/ios/Runner.xcarchive
+
+      # Krok: Upload pliku.xcarchive jako artefaktu
+      - name: Upload xcarchive as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Unsigned-iOS-Archive
+          path: Runner.xcarchive.zip
