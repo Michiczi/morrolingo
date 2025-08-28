@@ -32,7 +32,6 @@ class _PanelScreenState extends State<PanelScreen> {
   }
 
   Future<void> _initialize() async {
-    await _checkAndRequestPermissions();
     final database = await AppDatabase.instance;
     sharedPreferences = await SharedPreferences.getInstance();
     if (mounted) {
@@ -41,18 +40,6 @@ class _PanelScreenState extends State<PanelScreen> {
         _subjects = sharedPreferences.getStringList('subjects') ?? [];
         _isLoading = false;
       });
-    }
-  }
-
-  Future<void> _checkAndRequestPermissions() async {
-    Map<Permission, PermissionStatus> statuses = await [
-      Permission.camera,
-      Permission.photos,
-    ].request();
-
-    if (statuses[Permission.camera] == PermissionStatus.permanentlyDenied ||
-        statuses[Permission.photos] == PermissionStatus.permanentlyDenied) {
-      await openAppSettings();
     }
   }
 
