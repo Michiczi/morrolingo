@@ -26,8 +26,6 @@ jobs:
       - name: Clean build environment
         run: |
           flutter clean
-          pod cache clean --all
-          rm -rf ~/Library/Developer/Xcode/DerivedData
 
       - name: Install dependencies
         run: flutter pub get
@@ -36,25 +34,31 @@ jobs:
         run: pod install
         working-directory: ios
 
-      # Krok: Budowanie archiwum Xcode bez podpisu (xcarchive)
-      - name: Build Xcode archive without code signing
-        run: |
-          flutter build ipa --no-codesign
-        
-      # Krok: Zmiana nazwy archiwum, aby było łatwiejsze do zlokalizowania
-      - name: Rename xcarchive file
-        run: |
-          # Znajduje archiwum i kopiuje je do katalogu głównego
-          cp $(find build/ios/archive -name "*.xcarchive") build/ios/Runner.xcarchive
+      # Krok: Kompilacja niepodpisanej aplikacji
+      - name: Build unsigned.app file
+        run: flutter build ios --release --no-codesign
 
-      # Krok: Archiwizacja pliku.xcarchive
-      - name: Zip xcarchive for upload
+      # Krok: Tworzenie folderu "Payload"
+      - name: Prepare Payload directory
         run: |
-          zip -r Runner.xcarchive.zip build/ios/Runner.xcarchive
+          mkdir -p Payload
+        working-directory: build/ios/iphoneos
 
-      # Krok: Upload pliku.xcarchive jako artefaktu
-      - name: Upload xcarchive as artifact
+      # Krok: Przenoszenie pliku.app do "Payload"
+      - name: Move app bundle to Payload
+        run: |
+          mv Runner.app Payload/
+        working-directory: build/ios/iphoneos
+
+      # Krok: Zipping do.ipa
+      - name: Zip to.ipa
+        run: |
+          zip -r -y morrolingo.ipa Payload/
+        working-directory: build/ios/iphoneos
+
+      # Krok: Upload pliku.ipa jako artefaktu
+      - name: Upload unsigned.ipa as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Unsigned-iOS-Archive
-          path: Runner.xcarchive.zip
+          name: Unsigned-morrolingo-ipa
+          path: build/ios/iphoneos/morrolingo.ipa
