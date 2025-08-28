@@ -17,9 +17,13 @@ jobs:
 
       - run: flutter pub get
 
-      - name: Set iOS deployment target to 16
+      - name: Set iOS deployment target to 16 in Podfile
         run: |
           sed -i '' "s/platform :ios, '15.5'/platform :ios, '16.0'/g" ios/Podfile
+
+      - name: Force iOS Deployment Target in Xcode project
+        run: |
+          sed -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = 18.0;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g" ios/Runner.xcodeproj/project.pbxproj
 
       - run: pod repo update
         working-directory: ios
