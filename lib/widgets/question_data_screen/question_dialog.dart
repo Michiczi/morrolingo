@@ -65,39 +65,6 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
   }
 
   Future<void> _pickImageAndScan() async {
-    // 1. Sprawdź uprawnienia przed pokazaniem dialogu
-    final cameraStatus = await Permission.camera.status;
-    final photosStatus = await Permission.photos.status;
-
-    if (!mounted) return;
-
-    if (cameraStatus.isPermanentlyDenied || photosStatus.isPermanentlyDenied) {
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Brak uprawnień'),
-          content: const Text(
-            'Aby skorzystać z tej funkcji, potrzebny jest dostęp do aparatu i galerii. Przejdź do ustawień aplikacji, aby nadać uprawnienia.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Anuluj'),
-            ),
-            TextButton(
-              onPressed: () {
-                openAppSettings();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Ustawienia'),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
-
-    // 2. Pokaż dialog wyboru źródła
     final ImageSource? source = await showDialog<ImageSource>(
       context: context,
       builder: (context) => AlertDialog(
@@ -122,7 +89,6 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
 
     if (source == null) return; // Użytkownik zamknął dialog
 
-    // 3. Poproś o konkretne uprawnienie
     PermissionStatus status;
     if (source == ImageSource.camera) {
       status = await Permission.camera.request();
@@ -132,41 +98,14 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
 
     if (!mounted) return;
 
-    // 4. Sprawdź wynik
     if (status.isGranted || status.isLimited) {
       await _proceedWithImagePicking(source);
     } else {
-      // Użytkownik mógł ponownie trwale odmówić
-      if (status.isPermanentlyDenied) {
-        await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Brak uprawnień'),
-            content: Text(
-              'Dostęp do ${source == ImageSource.camera ? 'aparatu' : 'galerii'} jest trwale zablokowany. Przejdź do ustawień aplikacji, aby go włączyć.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK'),
-              ),
-              TextButton(
-                onPressed: () {
-                  openAppSettings();
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Ustawienia'),
-              ),
-            ],
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Odmówiono uprawnień. Nie można wybrać obrazu.'),
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Odmówiono uprawnień. Nie można wybrać obrazu.'),
+        ),
+      );
     }
   }
 
