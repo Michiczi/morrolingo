@@ -303,181 +303,157 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
                   }
                 }
 
-                // Jeśli są jakieś poprawne dane, przekaż je od razu do zapisu
-                if (validQuestionAnswerPairs.isNotEmpty) {
-                  if (_isEditMode && widget.questions != null) {
-                    // Tryb edycji wielu - musimy przetworzyć `validQuestionAnswerPairs`
-                    // na obiekt QuestionsStream, aby `question_data_screen` go obsłużył.
-                    final partialResult = QuestionsStream();
-                    final originalQuestions = widget.questions!;
-                    final remainingOriginals = List<Question>.from(
-                      originalQuestions,
-                    );
+                if (problematicRawLines.isNotEmpty) {
+                  // Errors were found. Save the valid ones and show errors.
+                  if (validQuestionAnswerPairs.isNotEmpty) {
+                    if (_isEditMode && widget.questions != null) {
+                      final partialResult = QuestionsStream();
+                      final originalQuestions = widget.questions!;
+                      final remainingOriginals =
+                          List<Question>.from(originalQuestions);
 
-                    for (final pair in validQuestionAnswerPairs) {
-                      final newQuestionText = pair['question']!;
-                      final newAnswerText = pair['answer']!;
-
-                      final originalIndex = remainingOriginals.indexWhere(
-                        (q) => q.question == newQuestionText,
-                      );
-
-                      if (originalIndex != -1) {
-                        final originalQuestion = remainingOriginals.removeAt(
-                          originalIndex,
+                      for (final pair in validQuestionAnswerPairs) {
+                        final newQuestionText = pair['question']!;
+                        final newAnswerText = pair['answer']!;
+                        final originalIndex = remainingOriginals.indexWhere(
+                          (q) => q.question == newQuestionText,
                         );
-                        if (originalQuestion.answer != newAnswerText) {
-                          partialResult.questionsToUpdate.add(
-                            originalQuestion.copyWith(answer: newAnswerText),
+
+                        if (originalIndex != -1) {
+                          final originalQuestion =
+                              remainingOriginals.removeAt(originalIndex);
+                          if (originalQuestion.answer != newAnswerText) {
+                            partialResult.questionsToUpdate.add(
+                              originalQuestion.copyWith(answer: newAnswerText),
+                            );
+                          }
+                        } else {
+                          partialResult.questionsToAdd.add(
+                            Question(
+                              subject: originalQuestions.first.subject,
+                              question: newQuestionText,
+                              answer: newAnswerText,
+                            ),
                           );
                         }
-                      } else {
-                        partialResult.questionsToAdd.add(
-                          Question(
-                            subject: originalQuestions.first.subject,
-                            question: newQuestionText,
-                            answer: newAnswerText,
-                          ),
-                        );
                       }
+                      widget.onSavePartial?.call(partialResult);
+                    } else {
+                      // Bulk add mode
+                      widget.onSavePartial?.call(validQuestionAnswerPairs);
                     }
-                    widget.onSavePartial?.call(partialResult);
-                  } else {
-                    // Tryb dodawania wielu - dane zostaną zwrócone przez Navigator.pop
                   }
-                }
 
-                if (problematicRawLines.isNotEmpty) {
-                  // Jeśli są błędy, pokaż alert i pozwól na edycję
+                  // Update text field and show dialog
                   _multilineController.text = problematicRawLines.join('\n');
                   await showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('Wykryto problemy'),
-                      content: Builder(
-                        builder: (context) {
-                          final List<Widget> children = [];
-                          if (validQuestionAnswerPairs.isNotEmpty) {
-                            final count = validQuestionAnswerPairs.length;
-                            final message = _isEditMode
-                                ? (count == 1
-                                      ? '1 wpis został zaktualizowany.'
-                                      : '$count wpisów zostało zaktualizowanych.')
-                                : (count == 1
-                                      ? '1 poprawne pytanie zostało dodane.'
-                                      : '$count poprawnych pytań zostało dodanych.');
-                            children.add(Text(message));
-                            children.add(const SizedBox(height: 16));
-                          }
-                          children.add(
-                            Text(
-                              problematicRawLines.length == 1
-                                  ? 'Poniższy wpis wymaga poprawy:'
-                                  : 'Poniższe wpisy wymagają poprawy:',
-                            ),
-                          );
-                          children.add(const SizedBox(height: 8));
-                          children.addAll(
-                            problematicRawLines.map((line) => Text('• $line')),
-                          );
+                      title: const Text('Wykryto problemy'),
+                      content: Builder(builder: (context) {
+                        final List<Widget> children = [];
+                        if (validQuestionAnswerPairs.isNotEmpty) {
+                          final count = validQuestionAnswerPairs.length;
+                          final message = _isEditMode
+                              ? (count == 1
+                                  ? '1 wpis został zaktualizowany.'
+                                  : '$count wpisów zostało zaktualizowanych.')
+                              : (count == 1
+                                  ? '1 poprawne pytanie zostało dodane.'
+                                  : '$count poprawnych pytań zostało dodanych.');
+                          children.add(Text(message));
+                          children.add(const SizedBox(height: 16));
+                        }
+                        children.add(
+                          Text(
+                            problematicRawLines.length == 1
+                                ? 'Poniższy wpis wymaga poprawy:'
+                                : 'Poniższe wpisy wymagają poprawy:',
+                          ),
+                        );
+                        children.add(const SizedBox(height: 8));
+                        children.addAll(
+                          problematicRawLines.map((line) => Text('• $line')),
+                        );
 
-                          return SingleChildScrollView(
-                            child: ListBody(children: children),
-                          );
-                        },
-                      ),
+                        return SingleChildScrollView(
+                          child: ListBody(children: children),
+                        );
+                      }),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: Text('OK'),
+                          child: const Text('OK'),
                         ),
                       ],
                     ),
                   );
                 } else {
-                  // Jeśli wszystko jest OK, przetwarzaj dane
+                  // All entries are valid.
                   if (_isEditMode && widget.questions != null) {
-                    // 1. Przygotowanie danych
                     final result = QuestionsStream();
                     final originalQuestions = widget.questions!;
-
-                    // Listy, z których będziemy usuwać przetworzone elementy.
-                    final remainingOriginals = List<Question>.from(
-                      originalQuestions,
-                    );
+                    final remainingOriginals =
+                        List<Question>.from(originalQuestions);
                     final remainingNewLines = _multilineController.text
                         .split('\n')
                         .where((line) => line.trim().isNotEmpty)
                         .toList();
 
-                    // --- ETAP 1: Dopasowanie po treści pytania (wysoka pewność) ---
                     remainingNewLines.removeWhere((line) {
                       final parts = line.trim().split(' - ');
                       if (parts.length < 2) return false;
                       final newQuestionText = parts[0].trim();
-
-                      final originalIndex = remainingOriginals.indexWhere(
-                        (q) => q.question == newQuestionText,
-                      );
+                      final originalIndex = remainingOriginals
+                          .indexWhere((q) => q.question == newQuestionText);
 
                       if (originalIndex != -1) {
-                        final originalQuestion = remainingOriginals.removeAt(
-                          originalIndex,
-                        );
-                        final newAnswerText = parts
-                            .sublist(1)
-                            .join(' - ')
-                            .trim();
-
+                        final originalQuestion =
+                            remainingOriginals.removeAt(originalIndex);
+                        final newAnswerText =
+                            parts.sublist(1).join(' - ').trim();
                         if (originalQuestion.answer != newAnswerText) {
                           result.questionsToUpdate.add(
                             originalQuestion.copyWith(answer: newAnswerText),
                           );
                         }
-                        return true; // Usuń linię z listy do przetworzenia
+                        return true;
                       }
-                      return false; // Zostaw linię na etap 2
+                      return false;
                     });
 
-                    // --- ETAP 2: Dopasowanie po treści odpowiedzi (niższa pewność) ---
                     remainingNewLines.removeWhere((line) {
                       final parts = line.trim().split(' - ');
                       if (parts.length < 2) return false;
-                      final newAnswerText = parts.sublist(1).join(' - ').trim();
-
-                      final originalIndex = remainingOriginals.indexWhere(
-                        (q) => q.answer == newAnswerText,
-                      );
+                      final newAnswerText =
+                          parts.sublist(1).join(' - ').trim();
+                      final originalIndex = remainingOriginals
+                          .indexWhere((q) => q.answer == newAnswerText);
 
                       if (originalIndex != -1) {
-                        final originalQuestion = remainingOriginals.removeAt(
-                          originalIndex,
-                        );
+                        final originalQuestion =
+                            remainingOriginals.removeAt(originalIndex);
                         final newQuestionText = parts[0].trim();
-
-                        // Tutaj na pewno jest zmiana, bo pytanie nie pasowało w etapie 1
                         result.questionsToUpdate.add(
                           originalQuestion.copyWith(
                             question: newQuestionText,
                             answer: newAnswerText,
                           ),
                         );
-                        return true; // Usuń linię z listy do przetworzenia
+                        return true;
                       }
-                      return false; // Zostaw linię do dodania jako nowa
+                      return false;
                     });
 
-                    // 3. Przetwarzanie pozostałości
-                    // Wszystkie linie, które pozostały, to nowe pytania
                     for (final line in remainingNewLines) {
                       final parts = line.trim().split(' - ');
                       if (parts.length < 2) continue;
                       final newQuestionText = parts[0].trim();
-                      final newAnswerText = parts.sublist(1).join(' - ').trim();
+                      final newAnswerText =
+                          parts.sublist(1).join(' - ').trim();
                       if (newQuestionText.isEmpty || newAnswerText.isEmpty) {
                         continue;
                       }
-
                       result.questionsToAdd.add(
                         Question(
                           subject: originalQuestions.first.subject,
@@ -487,31 +463,20 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
                       );
                     }
 
-                    // to te, które użytkownik usunął.
                     result.questionsToDelete.addAll(remainingOriginals);
-
-                    // 4. Złożenie wyników i zamknięcie dialogu
                     Navigator.of(context).pop(result);
                   } else {
-                    // Tryb dodawania wielu pytań
+                    // Bulk add mode, all valid
                     if (validQuestionAnswerPairs.isNotEmpty) {
                       Navigator.of(context).pop(validQuestionAnswerPairs);
                     } else {
-                      Navigator.of(context).pop(); // Zamknij, jeśli puste
+                      Navigator.of(context).pop();
                     }
                   }
                 }
-              } else {
-                // Prosta walidacja
-                if (questionText.isNotEmpty && answerText.isNotEmpty) {
-                  // Zamyka dialog i zwraca mapę z danymi
-                  Navigator.of(
-                    context,
-                  ).pop({'question': questionText, 'answer': answerText});
-                }
               }
             },
-            child: Text('Zapisz'),
+            child: const Text('Zapisz'),
           ),
         ],
       ),
