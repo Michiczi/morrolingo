@@ -8,6 +8,10 @@ jobs:
     name: 🎉 iOS Build for Sideloading
     runs-on: macos-latest
     steps:
+      - name: Generate Podfile
+        run: |
+         cd ios && pod init
+
       - uses: actions/checkout@v3
 
       - uses: subosito/flutter-action@v2
