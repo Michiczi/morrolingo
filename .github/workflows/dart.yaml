@@ -44,7 +44,7 @@ jobs:
 
       - name: Zip to .ipa
         run: |
-          zip -r -y morrolingo.ipa Payload/
+          zip -r -y FlutterIpaExport.ipa Payload/
         working-directory: build/ios/iphoneos
 
       - name: Upload .ipa to GitHub Release
