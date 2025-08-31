@@ -53,6 +53,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/ios/iphoneos/FlutterIpaExport.ipa
           asset_name: FlutterIpaExport.ipa
-          tag: v1.0
+          tag: v1.0.1
           overwrite: true
-          body: "This is first sideloading release 🚀"
+          body: "Morrolingo 1.0.1 🚀"
+
