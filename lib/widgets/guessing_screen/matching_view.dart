@@ -42,6 +42,14 @@ class _MatchingViewState extends State<MatchingView> {
     _setupGame();
   }
 
+  @override
+  void didUpdateWidget(MatchingView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.questions != oldWidget.questions) {
+      _setupGame();
+    }
+  }
+
   void _setupGame() {
     final n = widget.questions.length;
 
@@ -67,7 +75,8 @@ class _MatchingViewState extends State<MatchingView> {
     if (gameEnded) return;
 
     // Prevent selection of incorrect items
-    if ((isQuestion && incorrectQuestionId == id) || (!isQuestion && incorrectAnswerId == id)) {
+    if ((isQuestion && incorrectQuestionId == id) ||
+        (!isQuestion && incorrectAnswerId == id)) {
       return;
     }
 
@@ -95,7 +104,7 @@ class _MatchingViewState extends State<MatchingView> {
     final qId = selectedQuestionId!;
     final aId = selectedAnswerId!;
 
-    if (idToAnswer[qId] == idToAnswer[aId]) {
+    if (qId == aId) {
       bool isGameFinished = false;
       setState(() {
         correctMatches[qId] = true;

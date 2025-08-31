@@ -8,7 +8,6 @@ import 'package:morrolingo/widgets/panel_screen/subject_card.dart';
 import '../database/app_database.dart';
 import '../database/question_dao.dart';
 import 'package:morrolingo/utilities/theme/custom/colors_palette.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class PanelScreen extends StatefulWidget {
   const PanelScreen({super.key});

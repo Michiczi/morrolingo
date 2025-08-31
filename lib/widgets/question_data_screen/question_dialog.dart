@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:morrolingo/database/question.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:morrolingo/utilities/class/questions_stream_class.dart';
 
 class AddQuestionDialog extends StatefulWidget {
@@ -89,18 +88,12 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
 
     if (source == null) return; // Użytkownik zamknął dialog
 
-    PermissionStatus status;
     if (source == ImageSource.camera) {
-      status = await Permission.camera.request();
-    } else {
-      status = await Permission.photos.request();
-    }
+    } else {}
 
     if (!mounted) return;
 
-
     await _proceedWithImagePicking(source);
-    
   }
 
   Future<void> _proceedWithImagePicking(ImageSource source) async {
@@ -310,8 +303,9 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
                     if (_isEditMode && widget.questions != null) {
                       final partialResult = QuestionsStream();
                       final originalQuestions = widget.questions!;
-                      final remainingOriginals =
-                          List<Question>.from(originalQuestions);
+                      final remainingOriginals = List<Question>.from(
+                        originalQuestions,
+                      );
 
                       for (final pair in validQuestionAnswerPairs) {
                         final newQuestionText = pair['question']!;
@@ -321,8 +315,9 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
                         );
 
                         if (originalIndex != -1) {
-                          final originalQuestion =
-                              remainingOriginals.removeAt(originalIndex);
+                          final originalQuestion = remainingOriginals.removeAt(
+                            originalIndex,
+                          );
                           if (originalQuestion.answer != newAnswerText) {
                             partialResult.questionsToUpdate.add(
                               originalQuestion.copyWith(answer: newAnswerText),
@@ -351,36 +346,38 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
                     context: context,
                     builder: (context) => AlertDialog(
                       title: const Text('Wykryto problemy'),
-                      content: Builder(builder: (context) {
-                        final List<Widget> children = [];
-                        if (validQuestionAnswerPairs.isNotEmpty) {
-                          final count = validQuestionAnswerPairs.length;
-                          final message = _isEditMode
-                              ? (count == 1
-                                  ? '1 wpis został zaktualizowany.'
-                                  : '$count wpisów zostało zaktualizowanych.')
-                              : (count == 1
-                                  ? '1 poprawne pytanie zostało dodane.'
-                                  : '$count poprawnych pytań zostało dodanych.');
-                          children.add(Text(message));
-                          children.add(const SizedBox(height: 16));
-                        }
-                        children.add(
-                          Text(
-                            problematicRawLines.length == 1
-                                ? 'Poniższy wpis wymaga poprawy:'
-                                : 'Poniższe wpisy wymagają poprawy:',
-                          ),
-                        );
-                        children.add(const SizedBox(height: 8));
-                        children.addAll(
-                          problematicRawLines.map((line) => Text('• $line')),
-                        );
+                      content: Builder(
+                        builder: (context) {
+                          final List<Widget> children = [];
+                          if (validQuestionAnswerPairs.isNotEmpty) {
+                            final count = validQuestionAnswerPairs.length;
+                            final message = _isEditMode
+                                ? (count == 1
+                                      ? '1 wpis został zaktualizowany.'
+                                      : '$count wpisów zostało zaktualizowanych.')
+                                : (count == 1
+                                      ? '1 poprawne pytanie zostało dodane.'
+                                      : '$count poprawnych pytań zostało dodanych.');
+                            children.add(Text(message));
+                            children.add(const SizedBox(height: 16));
+                          }
+                          children.add(
+                            Text(
+                              problematicRawLines.length == 1
+                                  ? 'Poniższy wpis wymaga poprawy:'
+                                  : 'Poniższe wpisy wymagają poprawy:',
+                            ),
+                          );
+                          children.add(const SizedBox(height: 8));
+                          children.addAll(
+                            problematicRawLines.map((line) => Text('• $line')),
+                          );
 
-                        return SingleChildScrollView(
-                          child: ListBody(children: children),
-                        );
-                      }),
+                          return SingleChildScrollView(
+                            child: ListBody(children: children),
+                          );
+                        },
+                      ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
@@ -394,8 +391,9 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
                   if (_isEditMode && widget.questions != null) {
                     final result = QuestionsStream();
                     final originalQuestions = widget.questions!;
-                    final remainingOriginals =
-                        List<Question>.from(originalQuestions);
+                    final remainingOriginals = List<Question>.from(
+                      originalQuestions,
+                    );
                     final remainingNewLines = _multilineController.text
                         .split('\n')
                         .where((line) => line.trim().isNotEmpty)
@@ -405,14 +403,18 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
                       final parts = line.trim().split(' - ');
                       if (parts.length < 2) return false;
                       final newQuestionText = parts[0].trim();
-                      final originalIndex = remainingOriginals
-                          .indexWhere((q) => q.question == newQuestionText);
+                      final originalIndex = remainingOriginals.indexWhere(
+                        (q) => q.question == newQuestionText,
+                      );
 
                       if (originalIndex != -1) {
-                        final originalQuestion =
-                            remainingOriginals.removeAt(originalIndex);
-                        final newAnswerText =
-                            parts.sublist(1).join(' - ').trim();
+                        final originalQuestion = remainingOriginals.removeAt(
+                          originalIndex,
+                        );
+                        final newAnswerText = parts
+                            .sublist(1)
+                            .join(' - ')
+                            .trim();
                         if (originalQuestion.answer != newAnswerText) {
                           result.questionsToUpdate.add(
                             originalQuestion.copyWith(answer: newAnswerText),
@@ -426,14 +428,15 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
                     remainingNewLines.removeWhere((line) {
                       final parts = line.trim().split(' - ');
                       if (parts.length < 2) return false;
-                      final newAnswerText =
-                          parts.sublist(1).join(' - ').trim();
-                      final originalIndex = remainingOriginals
-                          .indexWhere((q) => q.answer == newAnswerText);
+                      final newAnswerText = parts.sublist(1).join(' - ').trim();
+                      final originalIndex = remainingOriginals.indexWhere(
+                        (q) => q.answer == newAnswerText,
+                      );
 
                       if (originalIndex != -1) {
-                        final originalQuestion =
-                            remainingOriginals.removeAt(originalIndex);
+                        final originalQuestion = remainingOriginals.removeAt(
+                          originalIndex,
+                        );
                         final newQuestionText = parts[0].trim();
                         result.questionsToUpdate.add(
                           originalQuestion.copyWith(
@@ -450,8 +453,7 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
                       final parts = line.trim().split(' - ');
                       if (parts.length < 2) continue;
                       final newQuestionText = parts[0].trim();
-                      final newAnswerText =
-                          parts.sublist(1).join(' - ').trim();
+                      final newAnswerText = parts.sublist(1).join(' - ').trim();
                       if (newQuestionText.isEmpty || newAnswerText.isEmpty) {
                         continue;
                       }
@@ -487,10 +489,9 @@ class _AddQuestionDialogState extends State<AddQuestionDialog> {
                     Navigator.of(context).pop(updatedQuestion);
                   } else {
                     // Add mode: return map
-                    Navigator.of(context).pop({
-                      'question': questionText,
-                      'answer': answerText,
-                    });
+                    Navigator.of(
+                      context,
+                    ).pop({'question': questionText, 'answer': answerText});
                   }
                 } else {
                   // Optional: Show an error if fields are empty

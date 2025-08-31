@@ -126,6 +126,15 @@ class _SummaryViewState extends State<SummaryView>
                 }
               });
             }
+          })
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed) {
+              Vibration.hasVibrator().then((hasVib) {
+                if (hasVib) {
+                  Vibration.cancel();
+                }
+              });
+            }
           });
 
     _textAnimationController = AnimationController(
@@ -196,17 +205,27 @@ class _SummaryViewState extends State<SummaryView>
                   animation: _textAnimation,
                   builder: (context, child) {
                     final animatedFontSize =
-                        10.0 + (50.0 - 10.0) * _textAnimation.value;
+                        10.0 + (60.0 - 10.0) * _textAnimation.value;
                     return SizedBox(
                       width: 300,
                       height: 150,
                       child: FittedBox(
-                        child: GrowingText(
-                          text: _finalText,
-                          style: TextStyle(
-                            fontSize: animatedFontSize,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF426E33),
+                        child: ShaderMask(
+                          shaderCallback: (bounds) => const LinearGradient(
+                            colors: [
+                              TColors.success,
+                              TColors.greenButtonBottom,
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ).createShader(bounds),
+                          child: GrowingText(
+                            text: _finalText,
+                            style: TextStyle(
+                              fontSize: animatedFontSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),

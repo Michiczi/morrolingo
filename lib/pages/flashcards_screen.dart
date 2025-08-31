@@ -40,7 +40,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
     if (subjectName != null) {
       _loadQuestions();
     }
-  } 
+  }
 
   @override
   void didChangeDependencies() {
@@ -244,7 +244,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                       text: 'POWTÓRZ',
                       style: CustomButtonStyle(
                         buttonColor: TColors.warning,
-                        bottomColor: TColors.warning,
+                        bottomColor: Colors.orange.shade800,
                       ),
                     ),
                   ),
@@ -259,7 +259,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                       text: 'DALEJ',
                       style: CustomButtonStyle(
                         buttonColor: TColors.success,
-                        bottomColor: TColors.success,
+                        bottomColor: Color(0xFF2E7D32),
                       ),
                     ),
                   ),
@@ -271,4 +271,3 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
     );
   }
 }
-

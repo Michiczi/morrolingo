@@ -39,7 +39,7 @@ class _GuessingScreenState extends State<GuessingScreen> {
   int _highestStreak = 0;
   late DateTime _sessionStartTime;
 
-  Key _matchingViewKey = UniqueKey();
+  
   int _lastStreakPopupValue = 0;
 
   Question? _currentQuestion;
@@ -334,7 +334,7 @@ class _GuessingScreenState extends State<GuessingScreen> {
           }
           _answeredQuestions.addAll(_matchingQuestions);
           _questions.removeWhere((q) => matchingIds.contains(q.id));
-          _matchingViewKey = UniqueKey(); // <--- ADDED THIS LINE
+          
         } else {
           _currentStreak = 0;
           for (final q in _matchingQuestions) {
@@ -375,7 +375,7 @@ class _GuessingScreenState extends State<GuessingScreen> {
           final matchingIds = _matchingQuestions.map((q) => q.id).toSet();
           _questions.removeWhere((q) => matchingIds.contains(q.id));
           _questions.addAll(_matchingQuestions);
-          _matchingViewKey = UniqueKey();
+          
         });
 
         _selectNextMode();
@@ -582,7 +582,6 @@ class _GuessingScreenState extends State<GuessingScreen> {
           );
         }
         return MatchingView(
-          key: _matchingViewKey,
           questions: _matchingQuestions,
           onGameFinished: _handleMatchingFinished,
           onMatchResult: _handleMatchingResult,

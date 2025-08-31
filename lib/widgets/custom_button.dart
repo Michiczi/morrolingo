@@ -38,27 +38,6 @@ class CustomButton extends StatefulWidget {
 class _CustomButtonState extends State<CustomButton> {
   bool _isPressed = false;
 
-  // Helper function to darken a color
-
-  void _onPointerDown(PointerDownEvent event) {
-    setState(() {
-      _isPressed = true;
-    });
-  }
-
-  void _onPointerUp(PointerUpEvent event) {
-    setState(() {
-      _isPressed = false;
-    });
-    widget.onPressed();
-  }
-
-  void _onPointerCancel(PointerCancelEvent event) {
-    setState(() {
-      _isPressed = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     // Use style properties with fallbacks to the theme
@@ -103,10 +82,11 @@ class _CustomButtonState extends State<CustomButton> {
         math.max(mainButtonHeight, extensionTopMargin + extensionHeight) +
         pressDepth;
 
-    return Listener(
-      onPointerDown: _onPointerDown,
-      onPointerUp: _onPointerUp,
-      onPointerCancel: _onPointerCancel,
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
+      onTap: widget.onPressed,
       child: SizedBox(
         width: double.infinity,
         height: totalWidgetHeight,
