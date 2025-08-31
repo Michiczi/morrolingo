@@ -44,15 +44,15 @@ jobs:
 
       - name: Zip to .ipa
         run: |
-          zip -r -y morrolingo.ipa Payload/
+          zip -r -y FlutterIpaExport.ipa Payload/
         working-directory: build/ios/iphoneos
 
       - name: Upload .ipa to GitHub Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/ios/iphoneos/morrolingo.ipa
-          asset_name: morrolingo.ipa
+          file: build/ios/iphoneos/FlutterIpaExport.ipa
+          asset_name: FlutterIpaExport.ipa
           tag: v1.0
           overwrite: true
           body: "This is first sideloading release 🚀"
