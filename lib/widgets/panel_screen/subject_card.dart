@@ -86,8 +86,8 @@ class SubjectCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: CustomButton(
-                      icon: Icons.book,
-                      text: 'Lekcja',
+                      icon: Icons.replay,
+                      text: 'Powtórka',
                       onPressed: onLessonPressed,
                       style: customButtonStyle,
                     ),

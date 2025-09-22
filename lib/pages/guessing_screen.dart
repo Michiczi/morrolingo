@@ -86,17 +86,25 @@ class _GuessingScreenState extends State<GuessingScreen> {
 
   Future<void> _loadQuestions() async {
     final database = await AppDatabase.instance;
-    final loadedQuestions = await database.questionDao.getQuestionsBySubject(
+    final allQuestions = await database.questionDao.getQuestionsBySubject(
       subjectName,
     );
 
-    loadedQuestions.shuffle();
+    List<Question> lessonQuestions;
+    if (allQuestions.length > 30) {
+      allQuestions.shuffle();
+      lessonQuestions = allQuestions.take(20).toList();
+    } else {
+      lessonQuestions = allQuestions;
+    }
+
+    lessonQuestions.shuffle();
 
     if (!mounted) return;
     setState(() {
-      _questions = List.from(loadedQuestions);
-      _questionPool = List.from(loadedQuestions);
-      _questionListLength = loadedQuestions.length;
+      _questions = List.from(lessonQuestions);
+      _questionPool = List.from(lessonQuestions);
+      _questionListLength = lessonQuestions.length;
       _sessionStartTime = DateTime.now();
       _isLoading = false;
       _selectNextMode();
