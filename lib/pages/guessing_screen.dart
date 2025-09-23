@@ -93,7 +93,7 @@ class _GuessingScreenState extends State<GuessingScreen> {
     List<Question> lessonQuestions;
     if (allQuestions.length > 30) {
       allQuestions.shuffle();
-      lessonQuestions = allQuestions.take(20).toList();
+      lessonQuestions = allQuestions.take(15).toList();
     } else {
       lessonQuestions = allQuestions;
     }
