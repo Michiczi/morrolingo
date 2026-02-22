@@ -1,7 +1,7 @@
 # Morrolingo
 
 <p align="center">
-  <img src="https/raw.githubusercontent.com/Michiczi/morrolingo/main/assets/images/morrolingo-icon.png" alt="Morrolingo Logo" width="150"/>
+  <img src="https://github.com/Michiczi/morrolingo/blob/040f2a590e097b84e0af4d8135544dec16d92350/assets/images/morrolingo-icon.png" alt="Morrolingo Logo" width="150"/>
 </p>
 
 <h2 align="center">A fully offline, Anki and Duolingo-inspired learning app based on flashcards.</h2>
