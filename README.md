@@ -11,6 +11,7 @@
 ---
 
 ## Table of Contents
+
 - [Description](#description)
 - [Key Features](#key-features)
 - [Permissions Rationale](#permissions-rationale)
@@ -18,10 +19,8 @@
 - [Installation](#installation)
   - [Android](#android)
   - [iOS (Sideloading)](#ios-sideloading)
-    - [Step 1: Install SideStore + Sideloadly](#step-1-install-sidestore--sideloadly)
-    - [Step 2: Add the Morrolingo Repository to SideStore](#step-2-add-the-morrolingo-repository-to-sidestore)
-    - [Step 3: Configure DNS (Anti-Revoke)](#step-3-configure-dns-anti-revoke)
 - [Contributing & Feedback](#contributing--feedback)
+- [License](#-license)
 
 ---
 
@@ -33,22 +32,22 @@ This app is designed for learners who want complete control over their study mat
 
 ### ✨ Key Features
 
-*   **Fully Offline:** Learn anytime, anywhere. All features are available without an internet connection.
-*   **Build Your Own Decks:** Create your own vocabulary sets from scratch to focus on what matters most to you.
-*   **Scan & Learn with OCR:** Use your device's camera to instantly scan text from books, menus, or signs. The app's Optical Character Recognition (OCR) digitizes the text, allowing you to create new flashcards on the fly.
-*   **Multiple Learning Modes:** Keep your study sessions engaging with various quiz formats:
-    *   Classic Flashcards
-    *   Multiple Choice Questions
-    *   Matching Games
-*   **Track Your Progress:** Stay motivated by tracking your daily learning streaks.
-*   **User-Provided Database:** Import your own pre-made vocabulary lists to get started quickly.
+- **Fully Offline:** Learn anytime, anywhere. All features are available without an internet connection.
+- **Build Your Own Decks:** Create your own vocabulary sets from scratch to focus on what matters most to you.
+- **Scan & Learn with OCR:** Use your device's camera to instantly scan text from books, menus, or signs. The app's Optical Character Recognition (OCR) digitizes the text, allowing you to create new flashcards on the fly.
+- **Multiple Learning Modes:** Keep your study sessions engaging with various quiz formats:
+  - Classic Flashcards
+  - Multiple Choice Questions
+  - Matching Games
+- **Track Your Progress:** Stay motivated by tracking your daily learning streaks.
+- **User-Provided Database:** Import your own pre-made vocabulary lists to get started quickly.
 
 ### 🔐 Permissions Rationale
 
 Morrolingo requests certain permissions only to enable its core features. Your privacy is a priority, and the app functions entirely offline.
 
-*   **📷 Camera Access:** Required for the OCR "Scan & Learn" feature. This allows the app to capture images of text from the physical world so you can turn them into digital flashcards.
-*   **📁 Storage / File Access:** Required for importing your own custom question databases and for selecting images from your gallery for text recognition.
+- **📷 Camera Access:** Required for the OCR "Scan & Learn" feature. This allows the app to capture images of text from the physical world so you can turn them into digital flashcards.
+- **📁 Storage / File Access:** Required for importing your own custom question databases and for selecting images from your gallery for text recognition.
 
 ### 💻 Technology Stack
 
@@ -75,22 +74,11 @@ The process has three main steps:
 2.  **Add App Source:** Add the Morrolingo repository to `SideStore`.
 3.  **Configure Anti-Revoke:** Apply DNS settings to prevent the app's certificate from expiring.
 
----
+#### Step 1: Install SideStore
 
-#### Step 1: Install SideStore + Sideloadly
+To install SideStore, please follow the official documentation for your computer's operating system (Windows 10+, macOS, or Linux). The guide will walk you through the entire process.
 
-Here, we will install the `SideStore` app on your iPhone, which will act as the source for installing and updating Morrolingo. We will use the `Sideloadly` program on a computer to accomplish this.
-
-1.  **Understand the SideStore installation process:**
-    *   **Instructional Video:** [**https://youtu.be/eP0onXuPd-8**](https://youtu.be/eP0onXuPd-8?si=fwM8CFWROn57u_NQ)
-    *   **Note:** Ignore the steps related to *AltServer*. Focus on the general concept and the device pairing process.
-
-2.  **Pair Your Device:**
-    *   The pairing process shown in the video might be outdated. Download the pairing app as shown and follow its current instructions to generate and download the required pairing file.
-
-3.  **Install Sideloadly and Sideload SideStore:**
-    *   **Instructional Video:** [**https://youtu.be/iVCDjyopxVA**](https://youtu.be/iVCDjyopxVA?si=pUyb2QJ5u3EMgnta)
-    *   Follow this video's instructions to install `Sideloadly` on your computer, then use it to install the **SideStore** `.ipa` file onto your iPhone.
+➡️ **[Official SideStore Installation Guide](https://docs.sidestore.io/docs/installation/prerequisites)**
 
 #### Step 2: Add the Morrolingo Repository to SideStore
 
@@ -109,11 +97,11 @@ Once `SideStore` is successfully installed on your iPhone, you need to add the s
 Apps sideloaded outside of the App Store have a certificate that is only valid for 7 days. To prevent it from expiring (requiring you to reinstall weekly), you must configure a special DNS profile.
 
 1.  **Understand the Method:**
-    *   **Explanatory Article:** [TechyBuff - Anti Revoke Shortcut](https://techybuff.com/anti-revoke-shortcut/)
+    - **Explanatory Article:** [TechyBuff - Anti Revoke Shortcut](https://techybuff.com/anti-revoke-shortcut/)
 
 2.  **Download and Run the Shortcut:**
-    *   **Direct Shortcut Link:** [**AntiRevoke by iSpeedTest**](https://www.icloud.com/shortcuts/2253fa774c3442098be4baf1b03b8bb8)
-    *   Add this shortcut to your library and run it. The shortcut will automatically download and guide you through installing a DNS configuration profile that blocks Apple's servers from revoking the app certificate.
+    - **Direct Shortcut Link:** [**AntiRevoke by iSpeedTest**](https://www.icloud.com/shortcuts/2253fa774c3442098be4baf1b03b8bb8)
+    - Add this shortcut to your library and run it. The shortcut will automatically download and guide you through installing a DNS configuration profile that blocks Apple's servers from revoking the app certificate.
 
 After completing these three steps, Morrolingo will be fully functional on your iOS device.
 
@@ -122,3 +110,9 @@ After completing these three steps, Morrolingo will be fully functional on your 
 ### 🤝 Contributing & Feedback
 
 Have an idea for a new feature or found a bug? Feel free to open a new [Issue](https://github.com/Michiczi/morrolingo/issues) on GitHub.
+
+---
+
+### 📜 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
