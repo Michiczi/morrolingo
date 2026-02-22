@@ -1,16 +1,124 @@
-# morrolingo
+# Morrolingo
 
-A new Flutter project.
+<p align="center">
+  <img src="https/raw.githubusercontent.com/Michiczi/morrolingo/main/assets/images/morrolingo-icon.png" alt="Morrolingo Logo" width="150"/>
+</p>
 
-## Getting Started
+<h2 align="center">A fully offline, Anki and Duolingo-inspired learning app based on flashcards.</h2>
 
-This project is a starting point for a Flutter application.
+> **Note:** Currently, the Morrolingo application is available only in Polish. An English version is planned for future releases.
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Table of Contents
+- [Description](#description)
+- [Key Features](#key-features)
+- [Permissions Rationale](#permissions-rationale)
+- [Technology Stack](#technology-stack)
+- [Installation](#installation)
+  - [Android](#android)
+  - [iOS (Sideloading)](#ios-sideloading)
+    - [Step 1: Install SideStore + Sideloadly](#step-1-install-sidestore--sideloadly)
+    - [Step 2: Add the Morrolingo Repository to SideStore](#step-2-add-the-morrolingo-repository-to-sidestore)
+    - [Step 3: Configure DNS (Anti-Revoke)](#step-3-configure-dns-anti-revoke)
+- [Contributing & Feedback](#contributing--feedback)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+### 📖 Description
+
+Morrolingo is a fully offline, privacy-focused language learning application inspired by the mechanics of Duolingo and the flexibility of Anki. It empowers you to build and study from your own custom vocabulary databases, turning the world around you into a personalized language lesson.
+
+This app is designed for learners who want complete control over their study material without being tied to an internet connection.
+
+### ✨ Key Features
+
+*   **Fully Offline:** Learn anytime, anywhere. All features are available without an internet connection.
+*   **Build Your Own Decks:** Create your own vocabulary sets from scratch to focus on what matters most to you.
+*   **Scan & Learn with OCR:** Use your device's camera to instantly scan text from books, menus, or signs. The app's Optical Character Recognition (OCR) digitizes the text, allowing you to create new flashcards on the fly.
+*   **Multiple Learning Modes:** Keep your study sessions engaging with various quiz formats:
+    *   Classic Flashcards
+    *   Multiple Choice Questions
+    *   Matching Games
+*   **Track Your Progress:** Stay motivated by tracking your daily learning streaks.
+*   **User-Provided Database:** Import your own pre-made vocabulary lists to get started quickly.
+
+### 🔐 Permissions Rationale
+
+Morrolingo requests certain permissions only to enable its core features. Your privacy is a priority, and the app functions entirely offline.
+
+*   **📷 Camera Access:** Required for the OCR "Scan & Learn" feature. This allows the app to capture images of text from the physical world so you can turn them into digital flashcards.
+*   **📁 Storage / File Access:** Required for importing your own custom question databases and for selecting images from your gallery for text recognition.
+
+### 💻 Technology Stack
+
+This application is built with **[Flutter](https://flutter.dev/)**, a cross-platform UI toolkit that allows it to deliver a native performance and feel on both Android and iOS from a single codebase.
+
+---
+
+## 📲 Installation
+
+### ▶️ Android
+
+1.  Navigate to the **[Releases](https://github.com/Michiczi/morrolingo/releases)** section of this repository.
+2.  Download the latest `.apk` file (e.g., `morrolingo-v1.0.0.apk`).
+3.  Open the downloaded file on your device. You may need to "Allow installation from unknown sources" in your phone's settings.
+4.  Follow the on-screen prompts to complete the installation.
+
+### 🍏 iOS (Sideloading)
+
+Due to Apple's ecosystem restrictions, installing on iOS requires a sideloading process using **SideStore**, an alternative app marketplace.
+
+The process has three main steps:
+
+1.  **Setup Sideloading Tools:** Install `SideStore` on your iPhone using a computer.
+2.  **Add App Source:** Add the Morrolingo repository to `SideStore`.
+3.  **Configure Anti-Revoke:** Apply DNS settings to prevent the app's certificate from expiring.
+
+---
+
+#### Step 1: Install SideStore + Sideloadly
+
+Here, we will install the `SideStore` app on your iPhone, which will act as the source for installing and updating Morrolingo. We will use the `Sideloadly` program on a computer to accomplish this.
+
+1.  **Understand the SideStore installation process:**
+    *   **Instructional Video:** [**https://youtu.be/eP0onXuPd-8**](https://youtu.be/eP0onXuPd-8?si=fwM8CFWROn57u_NQ)
+    *   **Note:** Ignore the steps related to *AltServer*. Focus on the general concept and the device pairing process.
+
+2.  **Pair Your Device:**
+    *   The pairing process shown in the video might be outdated. Download the pairing app as shown and follow its current instructions to generate and download the required pairing file.
+
+3.  **Install Sideloadly and Sideload SideStore:**
+    *   **Instructional Video:** [**https://youtu.be/iVCDjyopxVA**](https://youtu.be/iVCDjyopxVA?si=pUyb2QJ5u3EMgnta)
+    *   Follow this video's instructions to install `Sideloadly` on your computer, then use it to install the **SideStore** `.ipa` file onto your iPhone.
+
+#### Step 2: Add the Morrolingo Repository to SideStore
+
+Once `SideStore` is successfully installed on your iPhone, you need to add the source from which Morrolingo can be downloaded.
+
+1.  Open `SideStore` on your iPhone.
+2.  Navigate to the **"Sources"** tab.
+3.  Add a new repository using the link below:
+    ```
+    https://raw.githubusercontent.com/Michiczi/morrolingo/main/morrolingo.json
+    ```
+4.  After the repository is added, Morrolingo will appear on the list. Tap to install it.
+
+#### Step 3: Configure DNS (Anti-Revoke)
+
+Apps sideloaded outside of the App Store have a certificate that is only valid for 7 days. To prevent it from expiring (requiring you to reinstall weekly), you must configure a special DNS profile.
+
+1.  **Understand the Method:**
+    *   **Explanatory Article:** [TechyBuff - Anti Revoke Shortcut](https://techybuff.com/anti-revoke-shortcut/)
+
+2.  **Download and Run the Shortcut:**
+    *   **Direct Shortcut Link:** [**AntiRevoke by iSpeedTest**](https://www.icloud.com/shortcuts/2253fa774c3442098be4baf1b03b8bb8)
+    *   Add this shortcut to your library and run it. The shortcut will automatically download and guide you through installing a DNS configuration profile that blocks Apple's servers from revoking the app certificate.
+
+After completing these three steps, Morrolingo will be fully functional on your iOS device.
+
+---
+
+### 🤝 Contributing & Feedback
+
+Have an idea for a new feature or found a bug? Feel free to open a new [Issue](https://github.com/Michiczi/morrolingo/issues) on GitHub.

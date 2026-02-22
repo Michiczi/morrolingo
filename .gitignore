@@ -43,3 +43,15 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android specific
+/android/.gradle/
+/android/gradlew
+/android/gradlew.bat
+/android/gradle-wrapper.jar
+/android/build/
+/android/app/build/
+/android/key.properties
+/android/**/*.jks
+/android/**/*.keystore
+upload-keystore.jks
